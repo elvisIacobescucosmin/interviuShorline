@@ -1,0 +1,22 @@
+.home_module {
+  width: 80%;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+.home_module .selectors {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.show_avrage{
+  min-width: 150px;
+}
+.show_avrage label{
+  display: flex;
+  font-size: large;
+}
+.show_avrage label input{
+  margin-top: 8px;
+}
