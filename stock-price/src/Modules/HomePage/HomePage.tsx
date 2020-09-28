@@ -3,6 +3,8 @@ import Dropdown, {option} from "../../Components/Dropdown/Dropdown";
 import Chart from "../../Components/Chart/Chart";
 import "./style.css";
 import Loader from 'react-loader-spinner';
+import DatePicker from "react-datepicker";
+import "../../../node_modules/react-datepicker/dist/react-datepicker.css";
 
 type dropdownState = {
   symbol: string,
@@ -10,21 +12,31 @@ type dropdownState = {
   renderData: Array<any>,
   width: number,
   showAvrage: boolean,
-  filter: string,
   loading: boolean,
+  filterStartValue: any,
+  filterEndValue: any,
+  dinamicSimbol: string,
+  newLoading: boolean,
+  errmsg: string,
 }
+ const styles : any = {
+    slider:"",
+    sliderHighlightedTrack:"",
+    sliderTrack: "",
+    sliderHandle: "",
+ }
 
 const options : Array<option> = [{value: "MSFT", text: "Microsoft"},
-  {value: "TSLA", text:"tesla"},
-  {value: "NYSE", text: "Aple"},
+  {value: "TSLA", text: "Tesla"},
+  {value: "APLE", text: "Aple"},
   {value: "FB", text: "Facebook"},
-  {value: "NVDA", text:"Nvidia"},
-  {value: "INTC", text:"Intel"}];
+  {value: "NVDA", text: "Nvidia"},
+  {value: "INTC", text: "Intel"}];
 
-  const timeOptions : Array<option> = [
-    {value: "7", text: "Last week"},
-    {value: "30", text:"Last month"},
-    {value: "90", text: "last quarter"}];
+const value : any = {
+  start: 0,
+  end: 100,
+}
 
 export default class HomePage extends Component<{}, dropdownState> {
 
@@ -36,8 +48,12 @@ export default class HomePage extends Component<{}, dropdownState> {
       renderData: [],
       width: window.innerWidth - (window.innerWidth * 20 / 100),
       showAvrage: false,
-      filter: '7',
       loading: true,
+      filterStartValue: new Date(),
+      filterEndValue: new Date(),
+      dinamicSimbol: "",
+      newLoading: false,
+      errmsg: "",
     };
   }
 
@@ -48,7 +64,6 @@ export default class HomePage extends Component<{}, dropdownState> {
 
   componentUilllUnmount() {
     window.removeEventListener('resize', this.updateSize);
-
   }
 
   updateSize = () => {
@@ -56,35 +71,39 @@ export default class HomePage extends Component<{}, dropdownState> {
   }
 
   getData = () => {
-    "https://alpha-vantage.p.rapidapi.com/query?outputsize=compact&datatype=json&function=TIME_SERIES_DAILY_ADJUSTED&symbol=TSLA"
-    fetch(`https://alpha-vantage.p.rapidapi.com/query?outputsize=compact&datatype=json&function=TIME_SERIES_DAILY_ADJUSTED&symbol=${this.state.symbol}`, {
-    	"method": "GET",
-    	"headers": {
-    		"x-rapidapi-host": "alpha-vantage.p.rapidapi.com",
-    		"x-rapidapi-key": "76c0389856msh260005590f07261p1f419ajsnebc9cf49c2e2"
-    	}
-    })
-    .then(response => response.json())
-    .then(data => {
-      const newData = [];
-      for(var key in data["Time Series (Daily)"]){
-         newData.push({date: key,
-           open: data["Time Series (Daily)"][key]["1. open"],
-           high: data["Time Series (Daily)"][key]["2. high"],
-           low: data["Time Series (Daily)"][key]["3. low"],
-           close: data["Time Series (Daily)"][key]["4. close"],
-          });
-      }
-
-      this.setState({
-        data: newData,
-      }, () => {
-        this.filter();
+    this.setState({newLoading: true}, () => {
+      fetch(`https://alpha-vantage.p.rapidapi.com/query?outputsize=compact&datatype=json&function=TIME_SERIES_DAILY_ADJUSTED&symbol=${this.state.dinamicSimbol || this.state.symbol}`, {
+        "method": "GET",
+        "headers": {
+          "x-rapidapi-host": "alpha-vantage.p.rapidapi.com",
+          "x-rapidapi-key": "76c0389856msh260005590f07261p1f419ajsnebc9cf49c2e2"
+        }
       })
-    })
-    .catch(err => {
-    	console.log(err);
+      .then(response => response.json())
+      .then(data => {
+        const newData = [];
+        for(var key in data["Time Series (Daily)"]){
+           newData.push({date: key,
+             open: data["Time Series (Daily)"][key]["1. open"],
+             high: data["Time Series (Daily)"][key]["2. high"],
+             low: data["Time Series (Daily)"][key]["3. low"],
+             close: data["Time Series (Daily)"][key]["4. close"],
+            });
+        }
+
+        this.setState({
+          data: newData,
+          filterStartValue: new Date(newData[newData.length-1].date)
+        }, () => {
+          this.filter();
+        })
+      })
+      .catch(err => {
+        console.log(err);
+        this.setState({newLoading: false, errmsg: "Hyusten we have a problem"})
+      });
     });
+
   }
 
   callback=(value: string)=>{
@@ -93,21 +112,36 @@ export default class HomePage extends Component<{}, dropdownState> {
     })
   }
 
-  timeCallback = (value: string) => {
-    this.setState({filter: value}, () => {
-      this.filter();
-    })
+  timeRangeStart = (value: any) => {
+    this.setState({
+      filterStartValue: value,
+    }, () => this.filter())
+  }
+
+  timeRangeEnd = (value: any) => {
+    this.setState({
+      filterEndValue: value,
+    }, () => this.filter())
   }
 
   filter = () => {
-    const newData = [...this.state.data];
-    newData.splice( parseInt(this.state.filter)  ,newData.length - parseInt(this.state.filter));
+    const startMiliseconds = this.state.filterStartValue.getTime() / 1000;
+    const endMiliseconds = this.state.filterEndValue.getTime() / 1000;
+
+    const newData = []
+     this.state.data.forEach((value) => {
+      const valueDate = new Date(value.date).getTime() / 1000;
+      if(startMiliseconds <= valueDate && endMiliseconds >= valueDate){
+        newData.push(value);
+      }
+    });
+
     this.setState({
       renderData: newData,
       loading: false,
+      newLoading: false,
     });
 
-    // this.state.
   }
 
   handleAvrageChange = (event) => {
@@ -119,11 +153,49 @@ export default class HomePage extends Component<{}, dropdownState> {
     });
   }
 
+  updateDynamicSimbol = (event) => {
+      this.setState({dinamicSimbol: event.target.value})
+  }
+
+  handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+    this.getData();
+    }
+  }
+
   render() {
+
     return <div className="home_module">
       <div className="selectors">
         <Dropdown options={options} callback={this.callback} defaultValue={this.state.symbol} label="Stock symbol:"/>
-        <Dropdown options={timeOptions} callback={this.timeCallback} defaultValue={this.state.symbol} label="Time Period:"/>
+        <label className="symbol_input">
+           <div>Add your own symbol(ex:GOOGL):</div>
+          <input type="text" onChange={this.updateDynamicSimbol} value={this.state.dinamicSimbol} onKeyDown={this.handleKeyDown}/>
+        </label>
+      </div>
+      <div className="time_interval">
+        <div className="date_pikerzone1">
+          <span>Start Date: </span>
+          <DatePicker
+            selected={this.state.filterStartValue}
+            onChange={date => this.timeRangeStart(date)}
+            minDate={new Date( this.state.data.length > 0 ? this.state.data[this.state.data.length - 1].date : "")}
+            maxDate={new Date()}
+            selectsStart
+            showDisabledMonthNavigation
+          />
+        </div>
+        <div className="date_pikerzone2">
+          <span>End Date: </span>
+          <DatePicker
+            selected={this.state.filterEndValue}
+            onChange={date => this.timeRangeEnd(date)}
+            minDate={new Date( this.state.data.length > 0 ? this.state.data[this.state.data.length - 1].date : "")}
+            maxDate={new Date()}
+            selectsEnd
+            showDisabledMonthNavigation
+          />
+        </div>
         <div className="show_avrage">
           <label>
             {this.state.showAvrage && "Hide average"}
@@ -146,9 +218,15 @@ export default class HomePage extends Component<{}, dropdownState> {
             <Chart data={this.state.renderData} height={this.state.width/4} width={(this.state.width-35)/2} param="open" showAvrage={this.state.showAvrage}/>
             <Chart data={this.state.renderData} height={this.state.width/4} width={(this.state.width-35)/2} param="low" showAvrage={this.state.showAvrage}/>
           </div>
+          <div className="thirdRow">
+            <Chart data={this.state.renderData} height={this.state.width/2} width={this.state.width-20} param="open" showAvrage={this.state.showAvrage}/>
+            <Chart data={this.state.renderData} height={this.state.width/2} width={this.state.width-20} param="low" showAvrage={this.state.showAvrage}/>
+          </div>
         </>
       }
       {this.state.loading && <div className="loader_postion"><Loader type="Bars" color="#00BFFF" height={80} width={80} /></div>}
+      {!this.state.loading && this.state.newLoading && <div className="api_loader_postion"><Loader type="Bars" color="#00BFFF" height={80} width={80} /></div>}
+      {this.state.errmsg && <div className="error">{this.state.errmsg}</div>}
     </div>;
   }
 }

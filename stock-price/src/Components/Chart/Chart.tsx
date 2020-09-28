@@ -71,9 +71,9 @@ const Chart: FunctionComponent<chartProps> = ({data, showAvrage = false, height,
           .attr('d', value => drowline(value))
           .attr("fill", "none")
           .attr("stroke-width", 3)
-          .attr("stroke", "red").on("mouseover", () => {
+          .attr("stroke", "#f5c367").on("mouseover", () => {
             svg.selectAll(".circle")
-            .attr("stroke", "red")
+            .attr("stroke", "#f5c367")
             .attr("fill", "black");
           })
           .on("mouseout", () => {
@@ -92,7 +92,7 @@ const Chart: FunctionComponent<chartProps> = ({data, showAvrage = false, height,
             .attr("fill", "transparent")
             .on("mouseover", (event, value) => {
               select(event.target)
-              .attr("stroke", "red")
+              .attr("stroke", "#f5c367")
               .attr("fill", "black");
               svg.append("g")
               .attr("class", "popup")
@@ -115,7 +115,7 @@ const Chart: FunctionComponent<chartProps> = ({data, showAvrage = false, height,
               svg.select(".avg_line").remove();
               svg.append("line")
               .attr("class", "avg_line")
-              .attr("stroke", "yellow")
+              .attr("stroke", "#B3E4F9")
               .attr("stroke-width", 2)
               .attr("x1", xScale(new Date(stateData[stateData.length - 1].date)))
               .attr("y1", yScale(average))

@@ -3,11 +3,19 @@
   margin-left: 50%;
   transform: translateX(-50%);
 }
+.time_interval{
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 10px;
+}
+/* .date_pikerzone{
 
+} */
 .home_module .selectors {
   width: 100%;
   display: flex;
-  justify-content: space-around;
+  padding: 10px 10px;
   align-items: center;
 }
 .show_avrage{
@@ -26,4 +34,58 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.symbol_input{
+    padding-left: 10px
+}
+.symbol_input input{
+  padding: 0 2px;
+}
+.secondRow{
+  display: block;
+}
+.thirdRow{
+  display: none;
+}
+.api_loader_postion{
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media only screen and (max-width: 800px){
+  .time_interval{
+    flex-direction: column;
+    padding: 0px 10px;
+  }
+  .home_module .selectors {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px 10px;
+  }
+  .symbol_input{
+    padding: 10px 0px;
+  }
+  .secondRow{
+    display: none;
+  }
+  .thirdRow{
+    display: block;
+  }
+  .date_pikerzone1, .date_pikerzone2{
+    padding:10px 0;
+  }
+  .home_module .selectors .dropdown_compmonent{
+    display:flex;
+  }
+  .home_module .selectors .dropdown_compmonent div, .home_module .selectors .symbol_input div{
+    padding-right: 5px;
+  }
+  .home_module .selectors .symbol_input{
+    display: flex;
+  }
 }
