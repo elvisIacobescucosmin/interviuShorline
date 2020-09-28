@@ -19,12 +19,6 @@ type dropdownState = {
   newLoading: boolean,
   errmsg: string,
 }
- const styles : any = {
-    slider:"",
-    sliderHighlightedTrack:"",
-    sliderTrack: "",
-    sliderHandle: "",
- }
 
 const options : Array<option> = [{value: "MSFT", text: "Microsoft"},
   {value: "TSLA", text: "Tesla"},
@@ -32,11 +26,6 @@ const options : Array<option> = [{value: "MSFT", text: "Microsoft"},
   {value: "FB", text: "Facebook"},
   {value: "NVDA", text: "Nvidia"},
   {value: "INTC", text: "Intel"}];
-
-const value : any = {
-  start: 0,
-  end: 100,
-}
 
 export default class HomePage extends Component<{}, dropdownState> {
 

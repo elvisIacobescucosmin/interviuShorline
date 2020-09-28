@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, FunctionComponent } from "react";
+import React, { useState, FunctionComponent } from "react";
 import "./Dropdown.css";
 
  export type option = {
