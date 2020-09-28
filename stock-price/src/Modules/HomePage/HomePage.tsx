@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Dropdown, {option} from "../../Components/Dropdown/Dropdown";
 import Chart from "../../Components/Chart/Chart";
 import "./style.css";
+import Loader from 'react-loader-spinner';
 
 type dropdownState = {
   symbol: string,
@@ -10,6 +11,7 @@ type dropdownState = {
   width: number,
   showAvrage: boolean,
   filter: string,
+  loading: boolean,
 }
 
 const options : Array<option> = [{value: "MSFT", text: "Microsoft"},
@@ -35,6 +37,7 @@ export default class HomePage extends Component<{}, dropdownState> {
       width: window.innerWidth - (window.innerWidth * 20 / 100),
       showAvrage: false,
       filter: '7',
+      loading: true,
     };
   }
 
@@ -63,7 +66,6 @@ export default class HomePage extends Component<{}, dropdownState> {
     })
     .then(response => response.json())
     .then(data => {
-    	// console.log(data["Time Series (Daily)"]);
       const newData = [];
       for(var key in data["Time Series (Daily)"]){
          newData.push({date: key,
@@ -73,7 +75,6 @@ export default class HomePage extends Component<{}, dropdownState> {
            close: data["Time Series (Daily)"][key]["4. close"],
           });
       }
-      // console.log(newData);
 
       this.setState({
         data: newData,
@@ -99,13 +100,11 @@ export default class HomePage extends Component<{}, dropdownState> {
   }
 
   filter = () => {
-    // console.log("i am hire", this.state.data.length - parseInt(this.state.filter));
     const newData = [...this.state.data];
     newData.splice( parseInt(this.state.filter)  ,newData.length - parseInt(this.state.filter));
-    console.log(newData);
-    // console.log(this.state.data);
     this.setState({
-      renderData: newData
+      renderData: newData,
+      loading: false,
     });
 
     // this.state.
@@ -121,9 +120,6 @@ export default class HomePage extends Component<{}, dropdownState> {
   }
 
   render() {
-    // console.log(this.state);
-
-
     return <div className="home_module">
       <div className="selectors">
         <Dropdown options={options} callback={this.callback} defaultValue={this.state.symbol} label="Stock symbol:"/>
@@ -140,13 +136,19 @@ export default class HomePage extends Component<{}, dropdownState> {
           </label>
         </div>
       </div>
-      <div className="firstRow">
-        <Chart data={this.state.renderData} height={this.state.width/2} width={this.state.width-20} showAvrage={this.state.showAvrage}/>
-      </div>
-      <div className="secondRow">
-        <Chart data={this.state.renderData} height={this.state.width/4} width={(this.state.width-35)/2} param="open" showAvrage={this.state.showAvrage}/>
-        <Chart data={this.state.renderData} height={this.state.width/4} width={(this.state.width-35)/2} param="low" showAvrage={this.state.showAvrage}/>
-      </div>
+      {
+        !this.state.loading &&
+        <>
+          <div className="firstRow">
+            <Chart data={this.state.renderData} height={this.state.width/2} width={this.state.width-20} showAvrage={this.state.showAvrage}/>
+          </div>
+          <div className="secondRow">
+            <Chart data={this.state.renderData} height={this.state.width/4} width={(this.state.width-35)/2} param="open" showAvrage={this.state.showAvrage}/>
+            <Chart data={this.state.renderData} height={this.state.width/4} width={(this.state.width-35)/2} param="low" showAvrage={this.state.showAvrage}/>
+          </div>
+        </>
+      }
+      {this.state.loading && <div className="loader_postion"><Loader type="Bars" color="#00BFFF" height={80} width={80} /></div>}
     </div>;
   }
 }
