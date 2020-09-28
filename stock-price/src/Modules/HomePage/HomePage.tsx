@@ -89,7 +89,7 @@ export default class HomePage extends Component<{}, dropdownState> {
       })
       .catch(err => {
         console.log(err);
-        this.setState({newLoading: false, errmsg: "Hyusten we have a problem"})
+        this.setState({newLoading: false, errmsg: "Houston we have a problem"})
       });
     });
 

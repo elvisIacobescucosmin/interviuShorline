@@ -47,6 +47,9 @@
 .thirdRow{
   display: none;
 }
+.error{
+  color: red;
+}
 .api_loader_postion{
   position: absolute;
   top: 0px;
