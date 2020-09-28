@@ -48,7 +48,7 @@ const Chart: FunctionComponent<chartProps> = ({data, showAvrage = false, height,
         }
       })
       setData(newData);
-    }, [data, height, width])
+    }, [data, height, width, param])
 
     useEffect( () => {
       // console.log(stateData);
@@ -125,7 +125,7 @@ const Chart: FunctionComponent<chartProps> = ({data, showAvrage = false, height,
             svg.select(".avg_line").remove();
           }
 
-    }, [stateData, showAvrage]);
+    }, [stateData, showAvrage, average, data, height, stateMax, stateMin, width]);
 
 
     return <React.Fragment>
